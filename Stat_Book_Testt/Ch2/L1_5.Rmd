@@ -1,0 +1,62 @@
+
+# student's t-test
+
+```{r}
+yield_nkd = c(1903, 1935, 1910, 2496, 2108, 1961, 2060, 1444, 1612, 1316, 1511)
+yield_kd = c(2009, 1915, 2011, 2463, 2180, 1925, 2122, 1482, 1542, 1443, 1535)
+
+n_nkd <- length(yield_nkd)
+x_nkd <- mean(yield_nkd)
+sigma_nkd <- sd(yield_nkd)
+
+n_kd <- length(yield_kd)
+x_kd <- mean(yield_kd)
+sigma_kd <- sd(yield_kd)
+
+df <- n_kd + n_nkd - 2
+
+sigma_p_2 <- ((n_nkd-1)*sigma_nkd^2 + (n_kd-1)*sigma_kd^2) / (n_nkd+n_kd-2)
+t <- (x_kd - x_nkd) / (sqrt(((sigma_nkd^2)/n_nkd) + ((sigma_kd^2)/n_kd)))
+tstat <- (x_nkd - x_kd) / (sqrt(sigma_p_2*((1/n_nkd)*(1/n_kd))))
+
+# get t = -0.23413 -> smaller than 50% -> p-value larger than 0.5 -> do not reject
+
+p_value <- 2 * pt(abs(tstat),df,lower.tail=FALSE)
+# p_value = 0.285 > 0.05 -> do not reject H1
+# GET DIFFERENT P-VALURE THAN FOR stat_res???
+
+# Verify w. built in function
+stat_res <- t.test(yield_kd,yield_nkd,alternative="two.sided",paired=FALSE,var.equal=TRUE,conf.level=0.95)
+# get P-value of 0.817 > 0.05 -> do not reject
+
+```
+
+```{r}
+# Visually assess data normality
+# need NHANES
+
+nhanes_subset <- NHANES %>%
+    filter(Age > 18 & Gender =="male")
+n_height <- sum(complete.cases(nhanes_subset$Height))
+
+nhanes_height <- na.omit(nhanes_subset$Height)
+
+#install.packages("car")
+#library(car)
+qqPlot(nhanes_height,xlab="normal quantiles",ylab="NHANES: height [cm]")
+#qqPlot works as last plot, but not earlier?? Becomes completely blank
+
+boxplot(nhanes_height,xlab="Nhanes:audit males",ylab="Height")
+
+normal_params <- fitdistr(nhanes_height,"normal")
+height_min <- min(nhanes_height)
+height_max <- max(nhanes_height)
+x_pdf <- seq(height_min, height_max,1)
+
+y_norm <- dnorm(x_pdf,normal_params$estimate["mean"],normal_params$estimate["sd"])
+
+hist(nhanes_height,freq=FALSE,xlab="height",ylab="density",main="NHANES height")
+lines(x_pdf,y_norm,col="blue")
+legend(x="topleft",c("normal"),col=c("blue"),lty=1,cex=1)
+
+```

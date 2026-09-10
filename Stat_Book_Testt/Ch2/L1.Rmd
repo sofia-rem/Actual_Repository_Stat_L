@@ -1,0 +1,88 @@
+
+```{r}
+# PDF / CDF for normal distribution
+
+mu <- 0
+sigma <- 1
+vec <- seq(-5,5,0.01)
+fx <- (1/ sqrt(2*pi*sigma^2)) * exp(-(vec-mu)^2/(2*sigma^2)) #pdf
+plot(vec,fx,type="l",lty=1) #plot
+
+xpdf <- dnorm(vec, mu, sigma) #PDF
+xcdf <- pnorm(vec, mu, sigma) #CDF
+
+plot(vec,fx,type="l",lty=1,col="red",ylab="p(x)",xlab="x") #plotting
+lines(vec,xpdf,type="l",lty=1,col="blue") #the lines?
+legend("topleft",legend=c("fx","pdf"),col=c("red","blue"),lty=1,cex=1) #info
+
+plot(vec,xcdf,type="l",lty=1,col="red",ylab="p(x)",xlab="x") #plot cdf
+```
+
+
+```{r}
+# INSTALL PACKAGE NHANES
+install.packages("NHANES")
+library(NHANES)
+install.packages("dplyr")
+library(dplyr)
+
+```
+
+```{r}
+# NORMAL DISTRIBUTION
+nhanes_subset <- NHANES %>%
+    filter(Age > 18 & Gender == "male")
+n_height <- sum(complete.cases(nhanes_subset$Height))
+hist(nhanes_subset$Height,xlab="Height",ylab="Freq",main = paste("NHANES: Height (N=", n_height, ")"))
+
+mu <- 0
+sigma <- 1
+xvec <- seq(-5,5,0.01)
+fx <- (1/sqrt(2*pi*sigma^2)) * exp(-(xvec-mu)^2/(2*sigma^2))
+plot(xvec, fx, type="l", lty=1)
+
+xpdf <- dnorm(xvec, mu, sigma)
+xcdf <- pnorm(xvec, mu, sigma)
+
+plot(xvec, fx, type="l",col="red")
+lines(xvec, xpdf, type="l",col="blue") #fx and xpdf are basically same
+plot(xvec, xcdf, type="l", col="green")
+```
+
+```{r}
+# LOGNORMAL
+n_bmi <- sum(complete.cases(nhanes_subset$BMI))
+hist(nhanes_subset$BMI, breaks = seq(min(nhanes_subset$BMI, na.rm = TRUE), max(nhanes_subset$BMI, na.rm = TRUE), length.out = 25), xlab = "BMI [kg/m^2]", ylab = "Frequency", main = paste("NHANES: BMI (N =", n_bmi,")"))
+```
+
+```{r}
+# Exponential
+#install.packages("survival")
+#library(survival)
+#hist(lung.time)
+#????
+```
+
+```{r}
+# Binomial
+surgery_stat <- rbinom(421,1,0.981) # N=421 pers, p=0.981 survival
+N <- length(surgery_stat)
+
+count_outcome <- table(surgery_stat)
+barplot(count_outcome, names=c("deceased","survived"), main = paste("30-day outcome (N=",N,"patients)"),xlab="outcome",ylab="Freq")
+
+# probability
+probs <- prop.table(count_outcome)
+p_success <- as.numeric(probs[2])
+
+pmf_binom <- dbinom(x = c(0:100), size=100, prob=p_success)
+plot(0:100, pmf_binom, type="l",ylab="Prob.") #visar sannolikheten för att få X% överlevare
+
+```
+
+```{r}
+# Possion
+N <- 1000
+dat_arrival <- rpois(N,400.96)
+hist(dat_arrival, xlab="Nr entries", ylab="Freq.",main=paste("ED arrival data (N=",N,")"))
+```
