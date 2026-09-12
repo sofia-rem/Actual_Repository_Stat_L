@@ -1,0 +1,84 @@
+```{r}
+install.packages("ggplot2")
+install.packages("dplyr")
+library(ggplot2)
+library(dplyr)
+
+```
+
+```{r}
+# PARAMETRIC TESTS
+
+# 1 SAMPLE T TEST
+N_observations <- 100
+themean <- 7.1
+thesd <- 2.5
+theassumption <- 5
+# df1 is a vector of values w. distribution
+df1 <- tibble(NrCookies = round(pmax(rnorm(N_observations, mean=themean,sd=thesd),0)))
+A_one.samp.t.test <- t.test(df1, mu=theassumption)
+# LOW P-VALUE -> VALUE OF theassumption IS UNLIKELY -> REJECT
+
+# 2 SAMPLE T TEST
+group1 <- round(pmin(pmax(rnorm(N_observations, mean=9, sd=3),0),15))
+group2 <- round(pmin(pmax(rnorm(N_observations, mean=4, sd=2),0),15))
+# df2 has value (from vectors above), group (which vector), mean from vector
+df2 <- data.frame(value = c(group1,group2), 
+group = factor(c(rep("gr1",N_observations), 
+rep("gr2",N_observations)))) %>%
+    group_by(group) %>%
+    mutate(mean = mean(value)) %>%
+    ungroup()
+A_two.samp.ttest <- t.test(value ~ group, data=df2)
+# LOW P-VALUE -> STATISTICAL DIFFERENCE BETWEEN GROUPS -> REJECT H0
+
+# ANOVA - 3 or more groups
+grp1 <- round(pmin(pmax(rnorm(N_observations,mean=3,sd=2),0),15))
+grp2 <- round(pmin(pmax(rnorm(N_observations,mean=9,sd=3),0),15))
+grp3 <- round(pmin(pmax(rnorm(N_observations,mean=14,sd=3.5),0),15))
+df3 <- data.frame(value=c(grp1,grp2,grp3), 
+thetype = factor(c(rep("ch1",N_observations), 
+rep("ch2",N_observations), 
+rep("ch3",N_observations)))) %>%
+    group_by(thetype) %>%
+    mutate(mean=mean(value)) %>%
+    ungroup()
+A_aov <- aov(value ~ thetype, data=df3)
+summary(Aaov)
+# LOW P-VALUE (2e-16) -> STATISTICAL DIFFERENCE -> REJECT H0
+
+```
+
+```{r }
+
+# WILCOXON RANK SUM TEST
+A <- c(117.1, 121.3, 127.8, 121.9, 117.4, 124.5, 119.5, 115.1)
+B <- c(123.5, 125.3, 126.5, 127.9, 122.1, 125.6, 129.8, 117.2)
+dat <- data.frame(weight = c(A,B),
+company = rep(c("A","B"), each=length(A)),
+stringsAsFactors = TRUE)
+A_wilcox <- wilcox.test(weight ~ company, data = dat)
+# W=13 -> nr. times B[i] < A[i]
+# P-VALUE = 0.049 ~<= 5 -> may conclude medians of A / B differ
+```
+
+```{r}
+
+
+```
+
+```{r}
+oatmeal3 <- round(pmin(pmax(rnorm(100, mean = 3, sd = 2),  0), 15)) 
+chocolate3 <- round(pmin(pmax(rnorm(100, mean = 9, sd = 3),0), 15))
+sugar3 <- round(pmin(pmax(rnorm(100, mean = 14, sd = 3.5), 0), 15))
+#Create a data frame
+df3 <- data.frame(value = c(chocolate3, oatmeal3, sugar3),
+                 CookieType = factor(c(rep("chocolate", 100), 
+                                  rep("oatmeal", 100),
+                                  rep("sugar", 100)))) %>%
+  
+       #Calculate the mean value of each cookie type 
+       group_by(CookieType) %>%
+        mutate(mean = mean(value)) %>% 
+       ungroup()
+```

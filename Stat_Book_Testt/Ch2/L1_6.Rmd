@@ -1,0 +1,40 @@
+
+# 8:04
+# 12.15
+# 13.25
+
+# NON-PARAMETRIC TESTS
+
+```{r}
+# SIGN TEST
+# 1 sample // paired test of medians
+
+Nsuccesses <- 6
+Ntrials <- 15
+binom.test(Nsuccesses, Ntrials, alternative = "two.sided",conf.level=0.95)
+# result p=0.6072 > 0.05 -> do not reject H0 -> no significant amount of successes
+
+# WILCOXON SIGNED RANK TEST
+Nright <- rpois(Ntrials,4.87)
+Ndiff <- rnorm(Ntrials, mean=(5.04-4.87),sd=1)
+Nleft <- round(Nright+Ndiff)
+ wilcox.test(Nright, Nleft, paired = TRUE, exact = TRUE)
+
+ # WILCOXON RANKED SUM
+
+```
+
+```{r}
+#install.packages("ggplot2")
+#install.packages("dplyr")
+library(ggplot2)
+library(dplyr)
+
+# 1 SAMPLE T TEST
+N_observations <- 100
+themean <- 7.1
+thesd <- 2.5
+theassumption <- 5
+df1 <- tibble(NrCookies = round(pmax(rnorm(N_observations, mean=themean,sd=thesd),0)))
+one.samp.t.test <- t.test(df1, mu=theassumption)
+```
